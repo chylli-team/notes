@@ -1,0 +1,94 @@
+* dzil perlcritic OurPkgVersion PkgVersion perltidy
+When using PkgVersion, dzil will break perlcritic because it will insert version between *package* and *use strict*:
+
+Package A::B;
+$A::B::VERSION=0.1;
+use strict;
+use warnings;
+
+So I tried to use *OurPkgVersion*, that can generate  *VERSION* at anywhere. But it will break perltidy:
+
+our $VERSION = 0.1; # VERSION
+
+but perltidy want :
+
+our $VERSION = 0.1;     # VERSION
+
+at last I revert back to PkgVersion and add *no critic*:
+
+## no critic
+Package A::B;
+
+## use critic
+
+use strict;
+use warnings;
+
+*Note* there mast be a blank following package name.
+* unicode staff
+Perl Unicode转换概括：
+
+1.判断输入源的编码方式
+2.输入源是utf8编码
+　　a. Encode::_utf8_on($str);开启utf8 flag。
+　输入源非utf8编码
+　　a. $string = decode(ENCODING,$octets [,CHECK]);将输入源转化成utf8编码并开启utf8 flag
+3.输出 
+　　$str = Encode::encode(ENCODING, $str);把字符串从utf8编码转成指定的编码, 并关闭utf8 flag
+
+----------------------------------------------以下内容摘自网络------------------------------------------------------------------------------
+
+Perl Internal Form
+
+　　Perl中字符串只有两种形式：一种是字符串(Perl strings)。另外一种是字节流(bytes，标准称作octets)。编码类型分别是：utf8编码(字符串)和Ascii(字节流)
+
+UTF8 FLAG
+　　perl如何确定一个字符串是octets还是utf8编码的字符串呢? perl完全是靠字符串上的utf8 flag。在perl内部, 字符串结构由两部分组成: 数据和utf8 flag
+
+比如字符串“中国”在perl内部的存储是这样:
+　　utf8 flag    数据
+       　　 On    中国
+如果utf8 flag是On的话, perl则把“中国”当成utf8字符串来处理, 如果utf8 flag为Off, perl就会把他当成octets来处理。但要注意的是：不能根据utf8 flag来判定字符串是否是utf8编码。
+
+示例1：
+use Encode;
+use strict;
+
+my $str = "中国";
+Encode::_utf8_on($str);
+print length($str) . "\n";
+Encode::_utf8_off($str);
+print length($str) . "\n";
+
+运行结果是:
+Malformed UTF-8 character (unexpected end of string) at unicode.pl line 30
+2
+6
+
+使用Encode模块的_utf8_on函数和_utf8_off函数来开关字符串“中国”的utf8 flag。可以看到, utf8 flag打开的时候,"中国"被当成utf8字符串处理, 其长度是2。 utf8 flag关闭的时候,“中国”被当成octets(字节数组)处理, 出来的长度是6(我的编辑器用的是utf8编码, 如果你的编辑器用的是gb2312编码, 那么长度应该是4)。由于"中国"本来的编码是gb2312的, 不是utf8的,但开启utf8 flag后，Perl把"中国"当成utf8处理，这就可能导致错误发生:Malformed UTF-8 character(unexpected end of string)
+
+ 
+
+字符串来源
+
+　　为了应用上面说到的基本原则, 我们首先要知道字符串本来的编码和utf8 flag开关情况, 这里我们讨论几种情况。
+
+　　1) 命令行参数和标准输入。 从命令行参数或标准输入(STDIN)来的字符串, 它的编码跟locale有关。如果你的locale是zh_CN或zh_CN.gb2312,那么进来的字符串就是gb2312编码, 如果你的locale是zh_CN.gbk, 那么进来的编码就是gbk, 如果你的编码是zh_CN.UTF8, 那进来的编码就是utf8。不管是什么编码, 进来的字符串的utf8 flag都是关闭的状态。 
+
+　　2) 你的源代码里的字符串。 这要看你编写源代码时用的是什么编码。 在editplus里, 你可以通过“文件”->“另存为”查看和更改编码。在linux下, 你可以cat一个源代码文件, 如果中文正常显示, 说明源代码的编码跟locale是一致的。源代码里的字符串的utf8 flag同样是关闭的状态。　　
+
+     如果你的源代码里含有中文, 那么你最好遵循这个原则: 1) 编写代码时使用utf8编码,2)在文件的开头加上“use utf8;”语句。这样, 你源代码里的字符串就都会是utf8编码的, 并且utf8 flag也已经打开。
+
+　　3) 从文件读入。 这个毫无疑问, 你的文件是什么编码, 读进来就是什么编码了。读进来以后, utf8 flag是off状态。
+
+　　小结：不经过特殊处理，字符串的utf8 flag是off状态，perl就会把字符串当成octets来对待。这时候, 我们使用$string = decode(ENCODING, $octets) 用来解码字节流的。它按照你给出的编码格式(ENCODING)解释给定的字节流，把字节流从ENCODING编码转成utf8编码，并开启utf8 flag。不过有个例外就是, 如果字符串是仅仅ascii编码或EBCDIC编码的话, 不开启utf8 flag。注：本人尚不清楚如何判定字符串是否是ascii编码或EBCDIC编码
+
+输出
+
+　　字符串在程序内被正确地处理后, 要展现给用户。这时我们需要把字符串从perl internal form转化成用户能接受的形式。简单地说, 就是把字符串从utf8编码转换成输出的编码或表现界面的编码。这时候, 我们使用$str = Encode::encode('charset', $str);把字符串从utf8编码转成指定的编码, 并关闭utf8 flag。
+
+同样可以分为几种情况:
+　　1) 标准输出。标准输出的编码跟locale一致。输出的时候utf8 flag应该关闭, 不然就会出现我们前面看到的那行警告:
+Wide character in print at unicode.pl line 10.
+
+　　2）。。。。
