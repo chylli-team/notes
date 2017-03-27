@@ -28,12 +28,12 @@ use warnings;
 * unicode staff
 ** Perl Unicode转换概括：
 
-1. 判断输入源的编码方式
-1. 输入源是utf8编码
+- 判断输入源的编码方式
+  - 输入源是utf8编码
 　　a. Encode::_utf8_on($str);开启utf8 flag。
-　输入源非utf8编码
+　- 输入源非utf8编码
 　　a. $string = decode(ENCODING,$octets [,CHECK]);将输入源转化成utf8编码并开启utf8 flag
-1. 输出 
+- 输出 
 　　$str = Encode::encode(ENCODING, $str);把字符串从utf8编码转成指定的编码, 并关闭utf8 flag
 
 ** Perl Internal Form
