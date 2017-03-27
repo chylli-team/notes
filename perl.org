@@ -26,19 +26,17 @@ use warnings;
 
 *Note* there mast be a blank following package name.
 * unicode staff
-Perl Unicode转换概括：
+** Perl Unicode转换概括：
 
-1.判断输入源的编码方式
-2.输入源是utf8编码
+1. 判断输入源的编码方式
+1. 输入源是utf8编码
 　　a. Encode::_utf8_on($str);开启utf8 flag。
 　输入源非utf8编码
 　　a. $string = decode(ENCODING,$octets [,CHECK]);将输入源转化成utf8编码并开启utf8 flag
-3.输出 
+1. 输出 
 　　$str = Encode::encode(ENCODING, $str);把字符串从utf8编码转成指定的编码, 并关闭utf8 flag
 
-----------------------------------------------以下内容摘自网络------------------------------------------------------------------------------
-
-Perl Internal Form
+** Perl Internal Form
 
 　　Perl中字符串只有两种形式：一种是字符串(Perl strings)。另外一种是字节流(bytes，标准称作octets)。编码类型分别是：utf8编码(字符串)和Ascii(字节流)
 
