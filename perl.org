@@ -74,7 +74,7 @@ Malformed UTF-8 character (unexpected end of string) at unicode.pl line 30
 #+END_QUOTE
 
 使用Encode模块的_utf8_on函数和_utf8_off函数来开关字符串“中国”的utf8 flag。可以看到, utf8 flag打开的时候,"中国"被当成utf8字符串处理, 其长度是2。 utf8 flag关闭的时候,“中国”被当成octets(字节数组)处理, 出来的长度根据你的编辑器编码的不同而不同。
-如果编辑器用的编码是utf8,那结果是6, 如果你的编辑器用的是gb2312编码, 那么长度应该是4，并且由于"中国"本来的编码是gb2312的, 不是utf8的,但开启utf8 flag后，Perl把"中国"当成utf8处理，这就可能导致错误发生:Malformed UTF-8 character(unexpected end of string)
+如果编辑器用的编码是utf8,那结果是6, 如果你的编辑器用的是gb2312编码, 那么长度应该是4，并且由于"中国"本来的编码是gb2312的, 不是utf8的,但开启utf8 flag后，Perl把"中国"当成utf8处理，这就可能导致错误发生: =Malformed UTF-8 character(unexpected end of string)=
 
 
 ** 字符串来源
