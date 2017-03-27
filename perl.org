@@ -98,12 +98,12 @@ Malformed UTF-8 character (unexpected end of string) at unicode.pl line 30
 同样可以分为几种情况:
 
   1. 标准输出。标准输出的编码跟locale一致。输出的时候utf8 flag应该关闭, 不然就会出现我们前面看到的那行警告:
-#+BEGIN_QUOTE
-Wide character in print at unicode.pl line 10.
-#+END_QUOTE
+    #+BEGIN_QUOTE
+    Wide character in print at unicode.pl line 10.
+    #+END_QUOTE
 
   1. 设置binmode 
 
-#+BEGIN_SRC cperl
-binmode STDOUT, "encoding(UTF-8)"
-#+END_SRC
+    #+BEGIN_SRC cperl
+    binmode STDOUT, "encoding(UTF-8)"
+    #+END_SRC
