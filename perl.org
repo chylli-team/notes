@@ -30,12 +30,11 @@ use warnings;
 
 - 判断输入源的编码方式
   - 输入源是utf8编码
-
-    ~Encode::_utf8_on($str);~开启utf8 flag。
+    =Encode::_utf8_on($str);=开启utf8 flag。
   - 输入源非utf8编码
-    ~$string = decode(ENCODING,$octets [,CHECK]);~将输入源转化成utf8编码并开启utf8 flag
+    =$string = decode(ENCODING,$octets [,CHECK]);=将输入源转化成utf8编码并开启utf8 flag
 - 输出 
-  ~$str = Encode::encode(ENCODING, $str);~把字符串从utf8编码转成指定的编码, 并关闭utf8 flag
+  =$str = Encode::encode(ENCODING, $str);=把字符串从utf8编码转成指定的编码, 并关闭utf8 flag
 
 ** Perl Internal Form
 
